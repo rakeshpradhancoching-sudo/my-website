@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="or">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SB | Reset Password</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --sb-pink: #ff0080; --sb-purple: #7928ca; }
+        body { 
+            margin: 0; font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh; display: flex; justify-content: center; align-items: center;
+        }
+        .reset-card { 
+            background: white; width: 90%; max-width: 380px; padding: 40px 30px; 
+            border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center;
+        }
+        .icon-area { font-size: 50px; margin-bottom: 10px; }
+        h2 { color: #333; margin-bottom: 10px; }
+        p { color: #666; font-size: 13px; margin-bottom: 25px; }
+        input { 
+            width: 100%; padding: 14px; margin-bottom: 20px; border-radius: 25px; 
+            border: 1px solid #ddd; outline: none; box-sizing: border-box; 
+        }
+        .btn-reset { 
+            width: 100%; padding: 14px; background: var(--sb-pink); color: white; 
+            border: none; border-radius: 25px; font-weight: bold; cursor: pointer;
+        }
+        .back-link { margin-top: 20px; display: block; color: var(--sb-purple); text-decoration: none; font-size: 14px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="reset-card">
+    <div class="icon-area">🔑</div>
+    <h2>Forgot Password?</h2>
+    <p>Aapna registered email id bhariye, hum aapko password badalne ka link bhej denge.</p>
+    
+    <input type="email" id="resetEmail" placeholder="Enter your email">
+    <button class="btn-reset" onclick="handleReset()">SEND RESET LINK</button>
+    
+    <a href="index.html" class="back-link">← Back to Login</a>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+
+<script>
+    // --- APNI CONFIG YAHAN BHI DALEIN ---
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    function handleReset() {
+        const email = document.getElementById('resetEmail').value;
+        if(!email) return alert("Email address likhiye!");
+
+        auth.sendPasswordResetEmail(email)
+        .then(() => {
+            alert("Success! Password reset link aapke email par bhej diya gaya hai. Apna Inbox ya Spam folder check karein.");
+            window.location.href = "index.html";
+        })
+        .catch(err => {
+            alert("Error: " + err.message);
+        });
+    }
+</script>
+
+</body>
+</html>
+
