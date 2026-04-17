@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="or">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SB | My Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --sb-pink: #ff0080; --sb-purple: #7928ca; --sb-blue: #1877f2; }
+        body { font-family: 'Poppins', sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 80px; text-align: center; }
+        
+        /* Top Profile Header */
+        .profile-header { background: linear-gradient(135deg, var(--sb-pink), var(--sb-purple)); height: 160px; border-radius: 0 0 40px 40px; }
+        .pfp-large { 
+            width: 100px; height: 100px; background: white; border-radius: 50%; 
+            margin: -50px auto 10px; border: 5px solid white; display: grid; 
+            place-items: center; font-size: 40px; font-weight: 800; color: var(--sb-pink); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Stats Section */
+        .wallet-card { 
+            background: white; margin: 20px; padding: 25px; border-radius: 25px; 
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-around;
+        }
+        .stat-box h3 { margin: 0; color: var(--sb-purple); font-size: 24px; }
+        .stat-box span { font-size: 11px; color: #888; font-weight: 600; text-transform: uppercase; }
+
+        /* Menu */
+        .menu-list { background: white; margin: 20px; border-radius: 20px; text-align: left; overflow: hidden; }
+        .menu-item { padding: 18px 20px; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between; cursor: pointer; }
+        .menu-item:last-child { border: none; }
+        .menu-item:active { background: #f0f2f5; }
+
+        .btn-logout { 
+            background: none; border: 2px solid #ff4b2b; color: #ff4b2b; 
+            padding: 12px 40px; border-radius: 25px; font-weight: 800; 
+            cursor: pointer; margin-top: 20px; transition: 0.3s;
+        }
+        .btn-logout:hover { background: #ff4b2b; color: white; }
+
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; }
+        .nav-item { text-decoration: none; color: #888; font-size: 11px; text-align: center; }
+        .nav-item.active { color: var(--sb-pink); }
+    </style>
+</head>
+<body>
+
+<div class="profile-header"></div>
+<div class="pfp-large" id="pfpInitial">?</div>
+<h2 id="userName" style="margin-bottom: 5px;">Loading...</h2>
+<span id="userLevel" style="color: #666; font-size: 14px; background: #eee; padding: 3px 12px; border-radius: 15px;">Aspirant</span>
+
+<div class="wallet-card">
+    <div class="stat-box">
+        <h3 id="userPoints">0</h3>
+        <span>Points</span>
+    </div>
+    <div class="stat-box">
+        <h3>₹<span id="userCash">0.00</span></h3>
+        <span>Wallet</span>
+    </div>
+</div>
+
+<div class="menu-list">
+    <div class="menu-item" onclick="window.location.href='notes.html'">
+        <span>📚 My Notes</span>
+        <span>➔</span>
+    </div>
+    <div class="menu-item" onclick="alert('Redeem feature coming soon!')">
+        <span>💰 Withdraw Money</span>
+        <span>➔</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='home.html'">
+        <span>🏠 Back to Feed</span>
+        <span>➔</span>
+    </div>
+</div>
+
+<button class="btn-logout" onclick="logoutUser()">LOGOUT</button>
+
+<div class="bottom-nav">
+    <a href="home.html" class="nav-item">🏠<br>Home</a>
+    <a href="notes.html" class="nav-item">📚<br>Notes</a>
+    <a href="profile.html" class="nav-item active">👤<br>Profile</a>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+
+<script>
+    // --- APNI CONFIG YAHAN PASTE KAREIN ---
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Fetch User Data
+    auth.onAuthStateChanged(user => {
+        if (!user) {
+            window.location.href = "index.html"; // Login page
+        } else {
+            db.collection('users').doc(user.uid).onSnapshot(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById('userName').innerText = data.name;
+                    document.getElementById('pfpInitial').innerText = data.name.charAt(0).toUpperCase();
+                    document.getElementById('userLevel').innerText = data.education_level || "Student";
+                    document.getElementById('userPoints').innerText = data.points || 0;
+                    
+                    // Calculation: 100 Points = 1 Rupee (Aap ise badal sakte hain)
+                    let cash = (data.points / 100).toFixed(2);
+                    document.getElementById('userCash').innerText = cash;
+                }
+            });
+        }
+    });
+
+    // Logout Function
+    function logoutUser() {
+        if(confirm("Exit SB Pro?")) {
+            auth.signOut().then(() => {
+                window.location.href = "index.html";
+            });
+        }
+    }
+</script>
+
+</body>
+</html>
