@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="or">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SB | Home Feed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --sb-pink: #ff0080; --sb-purple: #7928ca; --sb-blue: #1877f2; --sb-bg: #f0f2f5; }
+        body { font-family: 'Poppins', sans-serif; background: var(--sb-bg); margin: 0; padding-bottom: 70px; }
+
+        /* Navigation Bar */
+        nav { 
+            background: linear-gradient(135deg, var(--sb-pink), var(--sb-purple), var(--sb-blue)); 
+            padding: 15px; display: flex; justify-content: space-between; align-items: center; 
+            color: white; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .user-profile-link { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .nav-pfp { width: 35px; height: 35px; background: white; color: var(--sb-pink); border-radius: 50%; display: grid; place-items: center; font-weight: 800; }
+
+        /* Post Creation Box */
+        .post-card { background: white; margin: 15px; padding: 15px; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .post-input { width: 100%; border: none; background: #f0f2f5; padding: 12px 20px; border-radius: 25px; outline: none; box-sizing: border-box; font-family: inherit; }
+        .post-btn { background: var(--sb-pink); color: white; border: none; padding: 8px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-top: 10px; float: right; }
+
+        /* Feed Posts */
+        #feed { margin-top: 20px; }
+        .feed-item { background: white; margin: 15px; padding: 15px; border-radius: 20px; border-left: 5px solid var(--sb-blue); position: relative; }
+        .feed-user { font-weight: 800; color: var(--sb-purple); font-size: 14px; }
+        .feed-text { margin: 10px 0; font-size: 15px; color: #333; }
+        .feed-time { font-size: 10px; color: #999; }
+
+        /* Bottom Menu */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; }
+        .nav-item { text-decoration: none; color: #888; font-size: 11px; text-align: center; font-weight: 600; }
+        .nav-item.active { color: var(--sb-pink); }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div style="font-weight: 800; font-size: 22px;">SB PRO</div>
+    <div class="user-profile-link" onclick="window.location.href='profile.html'">
+        <span id="navName">Loading...</span>
+        <div class="nav-pfp" id="navInitial">?</div>
+    </div>
+</nav>
+
+<div class="post-card">
+    <input type="text" id="postText" class="post-input" placeholder="Share a doubt or notes...">
+    <button class="post-btn" onclick="submitPost()">Post</button>
+    <div style="clear: both;"></div>
+</div>
+
+<div id="feed">
+    <p style="text-align: center; color: #999;">Fetching posts...</p>
+</div>
+
+<div class="bottom-nav">
+    <a href="home.html" class="nav-item active">🏠<br>Home</a>
+    <a href="notes.html" class="nav-item">📚<br>Notes</a>
+    <a href="profile.html" class="nav-item">👤<br>Profile</a>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+
+<script>
+    // --- APNI CONFIG YAHAN PASTE KAREIN ---
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUserName = "";
+
+    // 1. User Safety & Info Fetch
+    auth.onAuthStateChanged(user => {
+        if (!user) {
+            window.location.href = "index.html"; // Login nahi hai toh bahar pheko
+        } else {
+            db.collection('users').doc(user.uid).get().then(doc => {
+                if (doc.exists) {
+                    currentUserName = doc.data().name;
+                    document.getElementById('navName').innerText = currentUserName;
+                    document.getElementById('navInitial').innerText = currentUserName.charAt(0).toUpperCase();
+                }
+            });
+        }
+    });
+
+    // 2. Add New Post
+    function submitPost() {
+        const text = document.getElementById('postText').value;
+        if (!text) return alert("Kuch toh likhiye!");
+
+        db.collection('posts').add({
+            content: text,
+            userName: currentUserName,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            document.getElementById('postText').value = ""; // Clear input
+        });
+    }
+
+    // 3. Real-time Feed Update
+    db.collection('posts').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+        const feedDiv = document.getElementById('feed');
+        feedDiv.innerHTML = ""; // Clear old posts
+        
+        snapshot.forEach(doc => {
+            const post = doc.data();
+            feedDiv.innerHTML += `
+                <div class="feed-item">
+                    <span class="feed-user">${post.userName}</span>
+                    <p class="feed-text">${post.content}</p>
+                    <span class="feed-time">Sent from RK Coaching Hub</span>
+                </div>
+            `;
+        });
+    });
+</script>
+
+</body>
+</html>
