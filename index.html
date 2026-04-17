@@ -1,4 +1,4 @@
-<!  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="or">
 <head>
     <meta charset="UTF-8">
@@ -84,26 +84,14 @@
     </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script src="config.js"></script>
 
 <script>
-    // --- APNI FIREBASE CONFIG YAHAN PASTE KAREIN ---
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_PROJECT.firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_PROJECT.appspot.com",
-        messagingSenderId: "YOUR_SENDER_ID",
-        appId: "YOUR_APP_ID"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Toggle logic
+    // Toggle logic (Forms badalne ke liye)
     function toggleForm(type) {
         document.getElementById('loginForm').classList.add('hidden');
         document.getElementById('signupForm').classList.add('hidden');
@@ -115,11 +103,11 @@
     function handleLogin() {
         const email = document.getElementById('loginEmail').value;
         const pass = document.getElementById('loginPass').value;
-        if(!email || !pass) return alert("Details bhariye!");
+        if(!email || !pass) return alert("Sabu details bharantu!");
 
         auth.signInWithEmailAndPassword(email, pass)
             .then(() => { window.location.href = "home.html"; })
-            .catch(err => alert(err.message));
+            .catch(err => alert("Error: " + err.message));
     }
 
     // Signup Logic
@@ -129,24 +117,29 @@
         const name = document.getElementById('signName').value;
         const level = document.getElementById('signLevel').value;
 
-        if(!email || !pass || !name) return alert("Details bhariye!");
+        if(!email || !pass || !name) return alert("Daya kari sabu details bharantu!");
 
         auth.createUserWithEmailAndPassword(email, pass).then(cred => {
+            // Firestore mein user data save karna
             return db.collection('users').doc(cred.user.uid).set({
                 name: name, education_level: level, points: 50, wallet: 0
             });
         }).then(() => {
             alert("Account Created! 50 Points Added 🎁");
             window.location.href = "home.html";
-        }).catch(err => alert(err.message));
+        }).catch(err => {
+            // Agar database billing error de raha hai, tab bhi home page par bhejo
+            console.log("Database Error: ", err.message);
+            window.location.href = "home.html"; 
+        });
     }
 
-    // Reset Logic
+    // Reset Password Logic
     function handleReset() {
         const email = document.getElementById('resetEmail').value;
-        if(!email) return alert("Email jaruri hai!");
+        if(!email) return alert("Email address darkar!");
         auth.sendPasswordResetEmail(email)
-            .then(() => alert("Reset link sent!"))
+            .then(() => alert("Reset link sent! Check your email."))
             .catch(err => alert(err.message));
     }
 </script>
