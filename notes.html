@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="or">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SB | Library</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --sb-pink: #ff0080; --sb-purple: #7928ca; --sb-blue: #1877f2; }
+        body { font-family: 'Poppins', sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 80px; }
+
+        /* Header */
+        header { 
+            background: linear-gradient(135deg, var(--sb-purple), var(--sb-blue)); 
+            padding: 25px 15px; color: white; text-align: center; border-radius: 0 0 30px 30px;
+        }
+
+        /* Category Section */
+        .section-title { margin: 20px 15px 10px; font-weight: 800; color: #333; font-size: 18px; }
+        
+        /* Note Card */
+        .note-card { 
+            background: white; margin: 10px 15px; padding: 15px; border-radius: 20px; 
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 5px solid var(--sb-pink);
+        }
+        .note-info h4 { margin: 0; font-size: 15px; color: #333; }
+        .note-info p { margin: 3px 0 0; font-size: 12px; color: #888; }
+        
+        .download-btn { 
+            background: var(--sb-pink); color: white; text-decoration: none; 
+            padding: 8px 15px; border-radius: 15px; font-size: 12px; font-weight: 700;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; }
+        .nav-item { text-decoration: none; color: #888; font-size: 11px; text-align: center; font-weight: 600; }
+        .nav-item.active { color: var(--sb-pink); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2 style="margin:0;">SB Digital Library</h2>
+    <p style="font-size: 12px; opacity: 0.9;">RK Excellent Coaching Resources</p>
+</header>
+
+<div class="section-title">Government Exams (OSSC/UPSC)</div>
+
+<div class="note-card">
+    <div class="note-info">
+        <h4>Odia Sahitya (UPSC)</h4>
+        <p>Complete Syllabus PDF</p>
+    </div>
+    <a href="#" class="download-btn">Download</a>
+</div>
+
+<div class="note-card">
+    <div class="note-info">
+        <h4>Odisha History (OSSC)</h4>
+        <p>Modern History Notes</p>
+    </div>
+    <a href="#" class="download-btn">Download</a>
+</div>
+
+<div class="section-title">School Education (Class 10th)</div>
+
+<div class="note-card">
+    <div class="note-info">
+        <h4>Class 10th Math</h4>
+        <p>Geometry - Odia Medium</p>
+    </div>
+    <a href="Class10th.pdf" class="download-btn">Download</a>
+</div>
+
+<div class="note-card">
+    <div class="note-info">
+        <h4>Class 10th Science</h4>
+        <p>Physical Science Notes</p>
+    </div>
+    <a href="#" class="download-btn">Download</a>
+</div>
+
+<div class="bottom-nav">
+    <a href="home.html" class="nav-item">🏠<br>Home</a>
+    <a href="notes.html" class="nav-item active">📚<br>Notes</a>
+    <a href="profile.html" class="nav-item">👤<br>Profile</a>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+<script>
+    // Firebase Security Check
+    const firebaseConfig = { /* APNI CONFIG YAHAN BHI DALEIN */ };
+    firebase.initializeApp(firebaseConfig);
+    firebase.auth().onAuthStateChanged(user => {
+        if (!user) window.location.href = "index.html";
+    });
+</script>
+
+</body>
+</html>
